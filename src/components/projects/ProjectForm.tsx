@@ -1,12 +1,24 @@
+
 "use client";
 
 import { FormEvent, useState } from "react";
 
+type Project = {
+  name: string;
+  description: string;
+  status: "Active" | "In Progress" | "Completed";
+  progress: number;
+  tasksRemaining: number;
+  members: number;
+  dueDate?: string;
+};
+
 interface ProjectFormProps {
   onClose: () => void;
+  onCreate: (project: Project) => void;
 }
 
-const ProjectForm = ({ onClose }: ProjectFormProps) => {
+const ProjectForm = ({ onClose, onCreate }: ProjectFormProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<
@@ -18,15 +30,17 @@ const ProjectForm = ({ onClose }: ProjectFormProps) => {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    console.log({
-      name,
-      description,
+    const newProject: Project = {
+      name: name.trim(),
+      description: description.trim(),
       status,
+      progress: 0,
+      tasksRemaining: 0,
+      members: Number(members) || 0,
       dueDate,
-      members,
-    });
+    };
 
-    onClose();
+    onCreate(newProject);
   };
 
   return (
@@ -37,7 +51,6 @@ const ProjectForm = ({ onClose }: ProjectFormProps) => {
             <h2 className="text-lg font-semibold text-slate-900">
               Create New Project
             </h2>
-
             <p className="mt-1 text-sm text-slate-500">
               Add a new project to your workspace.
             </p>
@@ -61,7 +74,6 @@ const ProjectForm = ({ onClose }: ProjectFormProps) => {
             >
               Project Name
             </label>
-
             <input
               id="project-name"
               type="text"
@@ -80,7 +92,6 @@ const ProjectForm = ({ onClose }: ProjectFormProps) => {
             >
               Description
             </label>
-
             <textarea
               id="project-description"
               value={description}
@@ -100,7 +111,6 @@ const ProjectForm = ({ onClose }: ProjectFormProps) => {
               >
                 Status
               </label>
-
               <select
                 id="project-status"
                 value={status}
@@ -109,7 +119,7 @@ const ProjectForm = ({ onClose }: ProjectFormProps) => {
                     event.target.value as
                       | "Active"
                       | "In Progress"
-                      | "Completed",
+                      | "Completed"
                   )
                 }
                 className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -127,7 +137,6 @@ const ProjectForm = ({ onClose }: ProjectFormProps) => {
               >
                 Due Date
               </label>
-
               <input
                 id="project-due-date"
                 type="date"
@@ -145,11 +154,11 @@ const ProjectForm = ({ onClose }: ProjectFormProps) => {
             >
               Team Members
             </label>
-
             <input
               id="project-members"
               type="number"
               min="0"
+              step="1"
               value={members}
               onChange={(event) => setMembers(event.target.value)}
               placeholder="Number of team members"
