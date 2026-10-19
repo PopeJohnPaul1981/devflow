@@ -4,11 +4,21 @@ import { useState } from "react";
 import ProjectCard from "@/components/projects/ProjectCard";
 import ProjectForm from "@/components/projects/ProjectForm";
 
-const projects = [
+type Project = {
+  name: string;
+  description: string;
+  status: "Active" | "In Progress" | "Completed";
+  progress: number;
+  tasksRemaining: number;
+  members: number;
+  dueDate?: string;
+};
+
+const initialProjects: Project[] = [
   {
     name: "E-Commerce Platform",
     description: "Online shopping platform development.",
-    status: "Active" as const,
+    status: "Active",
     progress: 72,
     tasksRemaining: 18,
     members: 8,
@@ -16,7 +26,7 @@ const projects = [
   {
     name: "Mobile Application",
     description: "Cross-platform mobile application.",
-    status: "In Progress" as const,
+    status: "In Progress",
     progress: 45,
     tasksRemaining: 7,
     members: 5,
@@ -24,41 +34,54 @@ const projects = [
   {
     name: "API Development",
     description: "Backend API and service development.",
-    status: "Completed" as const,
+    status: "Completed",
     progress: 100,
     tasksRemaining: 0,
     members: 4,
   },
 ];
 
-const ProjectsPage = () => {
-    const [isFormOpen, setIsFormOpen] = useState(false);
+export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handleCreateProject = (project: Project) => {
+  console.log("NEW PROJECT RECEIVED:", project);
+
+  setProjects((currentProjects) => [
+    ...currentProjects,
+    project,
+  ]);
+
+  setIsFormOpen(false);
+};
+
   return (
     <div>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-slate-900">
             Projects
-            </h1>
+          </h1>
 
-            <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500">
             Manage and track your projects.
-            </p>
+          </p>
         </div>
 
         <button
-        type="button"
-        onClick={() => setIsFormOpen(true)}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white hover:bg-blue-700 sm:w-auto"
+          type="button"
+          onClick={() => setIsFormOpen(true)}
+          className="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white hover:bg-blue-700 sm:w-auto"
         >
-        + New Project
+          + New Project
         </button>
-        </div>
+      </div>
 
       <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
-        {projects.map((project) => (
+        {projects.map((project, index) => (
           <ProjectCard
-            key={project.name}
+            key={`${project.name}-${index}`}
             name={project.name}
             description={project.description}
             status={project.status}
@@ -68,11 +91,13 @@ const ProjectsPage = () => {
           />
         ))}
       </div>
-        {isFormOpen && (
-    <ProjectForm onClose={() => setIsFormOpen(false)} />
-    )}
+
+      {isFormOpen && (
+        <ProjectForm
+          onClose={() => setIsFormOpen(false)}
+          onCreate={handleCreateProject}
+        />
+      )}
     </div>
   );
-};
-
-export default ProjectsPage;
+}
