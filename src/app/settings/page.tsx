@@ -76,13 +76,16 @@ export default function SettingsPage() {
   }
 
   function saveSettings() {
-    try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-      setMessage("Settings saved successfully.");
-    } catch {
-      setMessage("Settings could not be saved in this browser.");
-    }
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+
+    window.dispatchEvent(new Event("devflow-theme-change"));
+
+    setMessage("Settings saved successfully.");
+  } catch {
+    setMessage("Settings could not be saved in this browser.");
   }
+}
 
   function exportData() {
     try {
